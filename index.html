@@ -10,8 +10,9 @@
     .neon{color:#0ff;text-shadow:0 0 5px #0ff,0 0 15px #0ff,0 0 25px #0ff}
     nav{background:#050505;position:sticky;top:0;z-index:100;padding:10px 0;box-shadow:0 0 15px #0ff66}
     nav .container{display:flex;justify-content:space-between;align-items:center;max-width:1000px;margin:auto;padding:0 16px}
-    .menu a{margin-left:16px;color:#0ff;text-decoration:none;font-weight:600;transition:.3s}
-    .menu a:hover{text-shadow:0 0 10px #0ff,0 0 20px #0ff;color:#fff}
+    .menu a{margin-left:16px;color:#0ff;text-decoration:none;font-weight:600;transition:.3s;display:inline-flex;align-items:center;gap:6px}
+    .menu a:hover{text-shadow:0 0 10px #0ff,0 0 20px #0ff;color:#fff;transform:scale(1.1);animation:bounce 0.6s}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
     section{padding:70px 20px;animation:fadeIn 1s ease both}
     @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
     .container{max-width:800px;margin:auto}
@@ -30,87 +31,127 @@
     .overlay{position:fixed;inset:0;background:#000d;display:grid;place-items:center;z-index:1000}
     .spinner{border:6px solid #333;border-top:6px solid #0ff;border-radius:50%;width:70px;height:70px;animation:spin 1s linear infinite;margin:auto}
     @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-    .loading-text{color:#0ff;margin-top:10px;font-family:'Orbitron',sans-serif;letter-spacing:2px;animation:blink 1s infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .loading-text{color:#0ff;margin-top:10px;font-family:'Orbitron',sans-serif;letter-spacing:2px}
+    footer{text-align:center;padding:20px;font-size:14px;color:#888}
+    .fb-logo{width:20px;height:20px;filter:drop-shadow(0 0 5px #0ff)}
   </style>
 </head>
 <body>
   <!-- LOADING -->
-  <div class="overlay" id="overlay">
-    <div>
-      <div class="spinner"></div>
-      <div class="loading-text">Loading…</div>
-    </div>
-  </div>
+  <div class="overlay" id="overlay"><div><div class="spinner"></div><div class="loading-text">Loading…</div></div></div>
 
   <!-- NAV -->
-  <nav><div class="container"><h2 class="neon">CHDS Recovery</h2><div class="menu"><a href="#home">Home</a><a href="#submit">Submit Issue</a><a href="#chat">AI Help</a><a href="#about">About</a></div></div></nav>
+  <nav>
+    <div class="container">
+      <h2 class="neon">CHDS Recovery</h2>
+      <div class="menu">
+        <a href="#home">Home</a>
+        <a href="#submit">Submit Issue</a>
+        <a href="#chat">AI Help</a>
+        <a href="#about">About</a>
+        <a href="https://m.me/chds.recovery" target="_blank">
+          <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" class="fb-logo"/> PM Us
+        </a>
+      </div>
+    </div>
+  </nav>
 
   <!-- HERO -->
-  <section id="home" class="hero"><div class="container"><div class="card"><h2 class="neon">Facebook Recovery Assistance</h2><p>Kumonekta sa AI para malaman ang mga possible issues at solutions.</p></div></div></section>
+  <section id="home" class="hero">
+    <div class="container">
+      <div class="card">
+        <h2 class="neon">Facebook Recovery Assistance</h2>
+        <p>Kumonekta sa AI para malaman ang mga possible issues at solutions.</p>
+      </div>
+    </div>
+  </section>
 
   <!-- FORM -->
-  <section id="submit"><div class="container"><div class="card"><h3 class="neon">Submit Your Issue</h3>
-    <form id="issueForm">
-      <input id="name" name="name" placeholder="Pangalan" required>
-      <input id="email" name="email" type="email" placeholder="Email" required>
-      <input id="fb" name="fb" placeholder="Facebook Profile Link">
-      <textarea id="issue" name="issue" placeholder="Describe the issue…" required></textarea>
-      <select id="priority" name="priority"><option>Normal</option><option>High</option><option>Critical</option></select>
-      <input type="submit" class="btn" value="Submit Issue">
-      <p id="formStatus"></p>
-    </form>
-  </div></div></section>
+  <section id="submit">
+    <div class="container">
+      <div class="card">
+        <h3 class="neon">Submit Your Issue</h3>
+        <form id="issueForm">
+          <input id="name" name="name" placeholder="Pangalan" required>
+          <input id="email" name="email" type="email" placeholder="Email" required>
+          <input id="fb" name="fb" placeholder="Facebook Profile Link">
+          <textarea id="issue" name="issue" placeholder="Describe the issue…" required></textarea>
+          <select id="priority" name="priority">
+            <option>Normal</option>
+            <option>High</option>
+            <option>Critical</option>
+          </select>
+          <input type="submit" class="btn" value="Send Issue">
+          <p id="formStatus"></p>
+        </form>
+      </div>
+    </div>
+  </section>
 
   <!-- CHATBOT -->
-  <section id="chat"><div class="container"><div class="card"><h3 class="neon">AI Customer Service</h3>
-    <div class="chat">
-      <div id="chatlog" class="chatlog"></div>
-      <div style="display:flex;gap:8px"><input id="chatInput" placeholder="Itanong mo dito…"><button id="sendBtn" class="btn">Send</button></div>
+  <section id="chat">
+    <div class="container">
+      <div class="card">
+        <h3 class="neon">AI Customer Service</h3>
+        <div class="chat">
+          <div id="chatlog" class="chatlog"></div>
+          <div style="display:flex;gap:8px">
+            <input id="chatInput" placeholder="Itanong mo dito…">
+            <button id="sendBtn" class="btn">Send</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div></div></section>
+  </section>
 
   <!-- ABOUT -->
-  <section id="about"><div class="container"><div class="card"><h3 class="neon">About</h3><p>Independent helper, hindi official ng Meta.</p></div></div></section>
+  <section id="about">
+    <div class="container">
+      <div class="card">
+        <h3 class="neon">About</h3>
+        <p>Independent helper, hindi official ng Meta.</p>
+      </div>
+    </div>
+  </section>
 
   <footer><div class="container">© <span id="year"></span> CHDS Recovery</div></footer>
 
   <script>
     const $=s=>document.querySelector(s);
     const speak=t=>{try{speechSynthesis.speak(new SpeechSynthesisUtterance(t))}catch(e){}};
-
-    // AUTO LOADING SCREEN
-    window.addEventListener('load',()=>{
-      setTimeout(()=>{
-        $('#overlay').style.display='none';
-        speak('Welcome to CHDS Recovery Service, please submit your issue.');
-      },2000);
-    });
+    const overlay=$('#overlay');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    async function showLoader(){overlay.style.display='grid';await sleep(2000);overlay.style.display='none';speak('Welcome to CHDS Recovery Service, please submit your issue.');}
+    showLoader(); // auto load animation
 
     $('#year').textContent=new Date().getFullYear();
 
-    // FORM
+    // FORM: mailto setup
     const form=$('#issueForm');const statusEl=$('#formStatus');
     form.addEventListener('submit',e=>{
       e.preventDefault();
-      statusEl.textContent='✅ Issue submitted successfully. Our team will review it soon.';
+      const data=Object.fromEntries(new FormData(form).entries());
+      const {name,email,issue}=data;
+      if(!name||!email||!issue){statusEl.textContent='Complete required fields.';return;}
+      window.location.href=`mailto:your-email@example.com?subject=Issue from ${name}&body=${encodeURIComponent("Email: "+email+"\nFB: "+data.fb+"\nPriority: "+data.priority+"\n\nIssue: "+issue)}`;
+      statusEl.textContent="✅ Issue submitted successfully. Please check your email client.";
     });
 
     // CHATBOT
     const chatlog=$('#chatlog');const input=$('#chatInput');const sendBtn=$('#sendBtn');
     function addBubble(t,who='bot'){const b=document.createElement('div');b.className='bubble '+who;b.textContent=t;chatlog.appendChild(b);chatlog.scrollTop=chatlog.scrollHeight;if(who==='bot')speak(t);}
-    function botAnswer(q){q=q.toLowerCase();
-      if(q.includes('submit')) return 'Para mag-submit: Pumunta sa Submit Issue tab at punan ang form. Makikita mo ang kumpirmasyon kapag naisumite na.';
-      if(q.includes('forgot')||q.includes('password')) return 'Kung nakalimutan ang password: 1) Gamitin ang Forgot Password option, 2) Piliin ang email o phone para makatanggap ng reset link, 3) Palitan agad ng strong password.';
-      if(q.includes('hacked')||q.includes('nahack')) return 'Kung nahack: 1) I-reset agad ang password, 2) Mag-log out sa lahat ng devices, 3) Enable 2FA, 4) Report ang hack sa Facebook Help Center.';
-      if(q.includes('locked')) return 'Kung locked: Dahil sa suspicious activity. Sundin ang on-screen instructions para sa identity verification (upload ng ID o code).';
-      if(q.includes('disabled')) return 'Kung disabled: Maaaring violation o error. Pumunta sa Facebook Help Center at mag-submit ng appeal gamit ang ID at detalye.';
-      if(q.includes('impersonation')||q.includes('fake')) return 'Kung may gumagaya sayo: I-report agad gamit ang Report tool. Piliin ang Pretending to Be Someone option at mag-upload ng patunay kung kailangan.';
-      if(q.includes('2fa')||q.includes('two factor')) return 'Kung problema sa 2FA: Siguraduhin na may access ka sa Authenticator App o SMS. Kung wala, gumamit ng recovery codes o mag-request ng support sa Facebook.';
-      if(q.includes('verify')||q.includes('verification')) return 'Kung hinihingi ang verification: Mag-upload ng malinaw at valid na ID. Sundin ang instructions sa verification page.';
-      if(q.includes('phishing')||q.includes('scam')) return 'Kung na-phish: 1) Palitan agad password, 2) I-check login devices, 3) Enable 2FA, 4) I-report ang phishing link.';
-      if(q.includes('recover')||q.includes('recovery')) return 'Recovery steps: 1) Subukan ang email/phone na naka-link, 2) Gumamit ng trusted contacts kung available, 3) Sundin ang official recovery form ng Facebook.';
-      return 'Pwede mong itanong tungkol sa: forgot password, hacked, locked, disabled, impersonation, 2FA, verification, phishing, o recovery. Sabihin mo lang ang sitwasyon at may gabay ako.';
+    function botAnswer(q){
+      q=q.toLowerCase();
+      if(q.includes('submit')) return 'Para mag-submit, pumunta sa Submit Issue tab at i-fill out ang form na may pangalan, email, at detalye ng problema.';
+      if(q.includes('forgot')||q.includes('password')) return 'Kung nakalimutan ang password, gamitin ang Forgot Password option ng Facebook. Makakatanggap ka ng reset link via email o SMS.';
+      if(q.includes('hacked')||q.includes('nahack')) return 'Kung nahack ang account mo: agad na i-reset ang password, i-logout lahat ng devices, i-enable ang 2FA, at i-report ang hack sa Facebook Help Center.';
+      if(q.includes('locked')) return 'Kung locked ang account mo, kadalasan dahil suspicious activity. Sundin ang instructions ng Facebook para sa ID verification o security check.';
+      if(q.includes('disabled')) return 'Kung disabled ang account, maaaring policy violation o mistake. Pwede kang mag-appeal gamit ang form sa Facebook Help Center.';
+      if(q.includes('impersonation')||q.includes('fake')) return 'Kung may gumagaya sayo, gamitin ang Report tool ng Facebook at piliin ang Pretending to Be Someone option.';
+      if(q.includes('2fa')||q.includes('two factor')) return 'Kung problema sa 2FA, siguraduhin na may access ka sa authentication method (SMS/Auth app). Kung wala, gamitin ang recovery codes o humingi ng tulong sa FB support.';
+      if(q.includes('verify')||q.includes('verification')) return 'Kung hiningi ang verification, kailangan ng valid ID para makapagpatuloy. Sundin ang verification page ng Facebook.';
+      if(q.includes('phishing')||q.includes('scam')) return 'Kung naloko ka sa phishing/scam link, agad na palitan ang password at i-check ang login activity para ma-secure ang account.';
+      if(q.includes('recover')||q.includes('recovery')) return 'Sa recovery, i-check kung alin sa email/number ang pwede mo pang gamitin. Kung wala na, gumamit ng trusted contacts o official recovery forms ng Facebook.';
+      return 'Pwede mong itanong tungkol sa: forgot password, hacked, locked, disabled, impersonation, 2FA, verification, phishing, o recovery. Sabihin mo lang ang sitwasyon at gagabayan kita.';
     }
     function send(){const q=input.value.trim();if(!q)return;addBubble(q,'user');input.value='';setTimeout(()=>addBubble(botAnswer(q),'bot'),500)}
     sendBtn.addEventListener('click',send);input.addEventListener('keydown',e=>{if(e.key==='Enter')send()});
