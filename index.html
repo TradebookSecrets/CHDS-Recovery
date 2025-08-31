@@ -3,436 +3,73 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CHDS Recovery Service</title>
-  <meta name="description" content="Neon-style Facebook recovery help: email issue submission + AI customer service chatbot." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Optional: EmailJS SDK (fill keys below to enable direct email sending) -->
-  <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
-    :root{
-      --bg:#06080f;          /* Deep space */
-      --panel:#0a0f1f;       /* Panel bg */
-      --text:#e6f3ff;        /* Primary text */
-      --muted:#9bc0ff;       /* Muted text */
-      --neon1:#00e5ff;       /* Cyan */
-      --neon2:#ff00ff;       /* Magenta */
-      --accent:#00ffa6;      /* Lime */
-      --danger:#ff4d6d;      /* Danger */
-      --ok:#00f5a1;         /* Success */
-      --shadow: 0 0 6px rgba(0,229,255,.6), 0 0 18px rgba(255,0,255,.25);
-      --radius:22px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: radial-gradient(1000px 600px at 20% -10%, rgba(0,229,255,.12), transparent 60%),
-                  radial-gradient(1000px 600px at 120% 10%, rgba(255,0,255,.10), transparent 60%),
-                  var(--bg);
-      color:var(--text);
-      overflow-x:hidden;
-    }
-    a{color:var(--neon1)}/* Neon text effect */
-.neon{
-  font-family:Orbitron, Inter, sans-serif;
-  letter-spacing:.03em;
-  text-shadow:0 0 8px rgba(0,229,255,.9), 0 0 14px rgba(255,0,255,.45);
-}
-
-/* Top nav */
-.nav{
-  position:sticky; top:0; z-index:50;
-  backdrop-filter: blur(10px);
-  background: linear-gradient(180deg, rgba(6,8,15,.75), rgba(6,8,15,.35));
-  border-bottom:1px solid rgba(155,192,255,.15);
-}
-.container{max-width:1100px; margin:0 auto; padding:16px}
-.nav-inner{display:flex; align-items:center; justify-content:space-between; gap:12px}
-.brand{display:flex; align-items:center; gap:10px}
-.brand h1{margin:0; font-size:20px}
-.badge{font-size:11px; color:var(--bg); background:linear-gradient(90deg, var(--neon1), var(--neon2)); padding:4px 8px; border-radius:999px; box-shadow:var(--shadow)}
-.menu{display:flex; gap:10px; flex-wrap:wrap}
-.btn, button, input[type="submit"]{
-  appearance:none; border:none; cursor:pointer; color:var(--bg); font-weight:700;
-  padding:12px 16px; border-radius:14px; background:linear-gradient(90deg, var(--neon1), var(--neon2));
-  box-shadow:0 6px 26px rgba(0,229,255,.25), inset 0 0 14px rgba(255,255,255,.2);
-  transition: transform .08s ease, box-shadow .2s ease; text-transform:uppercase; letter-spacing:.05em;
-}
-.btn:hover{transform:translateY(-1px)}
-.btn.ghost{background:transparent; color:var(--text); border:1px solid rgba(155,192,255,.25)}
-
-/* Sections */
-section{padding:56px 16px}
-.grid{display:grid; gap:18px}
-@media(min-width:900px){.grid-2{grid-template-columns:1.1fr .9fr}}
-
-.card{
-  background:linear-gradient(180deg, rgba(10,15,31,.8), rgba(10,15,31,.5));
-  border:1px solid rgba(155,192,255,.18);
-  border-radius:var(--radius); padding:20px; box-shadow:var(--shadow);
-}
-.label{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em}
-.field{display:flex; flex-direction:column; gap:6px; margin-bottom:14px}
-input, textarea, select{
-  width:100%; padding:12px 14px; border-radius:12px; background:#0c1226; color:var(--text);
-  border:1px solid rgba(155,192,255,.25); outline:none; box-shadow: inset 0 0 10px rgba(0,229,255,.08);
-}
-textarea{min-height:130px; resize:vertical}
-
-/* Hero */
-.hero{padding:90px 16px 40px}
-.headline{font-size:38px; line-height:1.1; margin:0 0 10px}
-.sub{color:var(--muted); margin:0 0 18px}
-
-/* Loader overlay */
-.overlay{position:fixed; inset:0; background:rgba(6,8,15,.95); display:none; place-items:center; z-index:999}
-.spinner{width:120px; height:120px; border-radius:999px; border:5px solid rgba(155,192,255,.15); position:relative; box-shadow:var(--shadow)}
-.spinner::before, .spinner::after{
-  content:""; position:absolute; inset:-5px; border-radius:inherit; border:5px solid transparent;
-  border-top-color:var(--neon1); animation:spin 1.2s linear infinite;
-}
-.spinner::after{border-top-color:var(--neon2); filter:blur(2px); animation-duration:1.8s}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{margin-top:18px; text-align:center; color:var(--muted)}
-
-/* Chatbot */
-.chat{display:flex; flex-direction:column; gap:12px; height:420px}
-.chatlog{flex:1; overflow:auto; padding:12px; border:1px solid rgba(155,192,255,.18); border-radius:14px; background:#0b1122}
-.bubble{max-width:80%; padding:10px 14px; margin:8px 0; border-radius:16px; position:relative}
-.bot{background:rgba(0,229,255,.12); border:1px solid rgba(0,229,255,.5)}
-.user{background:rgba(255,0,255,.12); border:1px solid rgba(255,0,255,.5); margin-left:auto}
-.tiny{font-size:12px; color:var(--muted)}
-
-/* Footer */
-footer{padding:30px 16px; text-align:center; color:var(--muted)}
-
-/* Floating speech toggle */
-.speech-toggle{position:fixed; right:16px; bottom:16px; z-index:40}
-
+    body{margin:0;font-family:'Inter',sans-serif;background:#050505;color:#eee;scroll-behavior:smooth}
+    .neon{color:#0ff;text-shadow:0 0 5px #0ff,0 0 10px #0ff,0 0 20px #0ff}
+    .btn{background:#0ff;color:#000;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:.2s}
+    .btn:hover{background:#0cc}
+    nav{background:#000;padding:10px 0;position:sticky;top:0;z-index:50}
+    nav .container{display:flex;justify-content:space-between;align-items:center;max-width:1000px;margin:auto;padding:0 16px}
+    .menu a{margin-left:12px;color:#0ff;text-decoration:none;font-weight:600}
+    section{padding:60px 20px}
+    .container{max-width:800px;margin:auto}
+    .card{background:#111;border:1px solid #0ff33;box-shadow:0 0 15px #0ff4;padding:20px;border-radius:12px}
+    .hero{display:grid;place-items:center;height:100vh;text-align:center}
+    form input,form textarea,form select{width:100%;margin:8px 0;padding:10px;background:#000;border:1px solid #0ff;color:#0ff;border-radius:8px}
+    .chat{display:flex;flex-direction:column;gap:12px;height:400px}
+    .chatlog{flex:1;overflow-y:auto;background:#000;padding:12px;border:1px solid #0ff;border-radius:8px}
+    .bubble{padding:8px 12px;margin:4px 0;border-radius:12px;max-width:80%}
+    .bubble.user{background:#0ff;color:#000;align-self:flex-end}
+    .bubble.bot{background:#222;border:1px solid #0ff;align-self:flex-start}
+    .overlay{position:fixed;inset:0;background:#000d;display:none;place-items:center;z-index:100}
+    .spinner{border:6px solid #333;border-top:6px solid #0ff;border-radius:50%;width:60px;height:60px;animation:spin 1s linear infinite;margin:auto}
+    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-  <!-- LOADING OVERLAY -->
-  <div class="overlay" id="overlay" aria-hidden="true" role="status" aria-live="polite">
-    <div>
-      <div class="spinner" aria-label="Loading"></div>
-      <div class="loading-text">Loading…</div>
-    </div>
-  </div>  <!-- NAV -->  <nav class="nav">
-    <div class="container nav-inner">
-      <div class="brand">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" stroke="url(#g)" stroke-width="2"/>
-          <path d="M8 12h8M12 8v8" stroke="url(#g)" stroke-width="2" stroke-linecap="round"/>
-          <defs><linearGradient id="g" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#00e5ff"/><stop offset="1" stop-color="#ff00ff"/></linearGradient></defs>
-        </svg>
-        <h1 class="neon">CHDS Recovery</h1>
-        <span class="badge">NEON</span>
-      </div>
-      <div class="menu">
-        <a class="btn ghost" href="#home">Home</a>
-        <a class="btn ghost" href="#submit">Submit Issue</a>
-        <a class="btn ghost" href="#chat">AI Help</a>
-        <a class="btn ghost" href="#about">About</a>
-      </div>
-    </div>
-  </nav>  <!-- HERO / HOME -->  <section id="home" class="hero">
-    <div class="container grid grid-2">
-      <div class="card">
-        <h2 class="headline neon">Facebook Recovery Assistance</h2>
-        <p class="sub">24/7 AI helper + email form. <strong>Click Enter</strong> to start. Kada click, may neon loading animation at may boses na babati: “Welcome CHDS Recovery Service, please submit the issue.”</p>
-        <div style="display:flex; gap:10px; flex-wrap:wrap">
-          <button class="btn" id="enterBtn">Enter</button>
-          <a href="#submit" class="btn ghost">Diretso sa Form</a>
-        </div>
-        <p class="tiny" style="margin-top:10px">Tip: Payagan ang Audio kung may prompt para sa speech. Secure & client-side lang ang AI helper.</p>
-      </div>
-      <div class="card">
-        <h3 class="neon" style="margin-top:0">Quick FAQ</h3>
-        <ul>
-          <li>Paano kung nakalimutan ang password? — Gumamit ng <em>Forgot Password</em> at i-check ang email/phone na naka-link.</li>
-          <li>Walang access sa email/phone? — Subukang i-recover muna ang email/number; o gamitin ang trusted contacts kung available.</li>
-          <li>Hacked ang account? — I-secure agad: palitan ang password, i-check ang sessions, at i-enable 2FA.</li>
-        </ul>
-        <p class="tiny">Note: Hindi kami official ng Meta. Guidance lang at pag-forward ng issue via email.</p>
-      </div>
-    </div>
-  </section>  <!-- SUBMIT ISSUE -->  <section id="submit">
-    <div class="container grid grid-2">
-      <div class="card">
-        <h3 class="neon" style="margin-top:0">Submit Your Issue</h3>
-        <form id="issueForm">
-          <div class="field">
-            <label class="label" for="name">Buong Pangalan</label>
-            <input id="name" name="name" placeholder="Juan Dela Cruz" required />
-          </div>
-          <div class="field">
-            <label class="label" for="email">Email mo</label>
-            <input id="email" name="email" type="email" placeholder="you@example.com" required />
-          </div>
-          <div class="field">
-            <label class="label" for="fb">Facebook Profile / Link</label>
-            <input id="fb" name="fb" placeholder="https://facebook.com/your.profile" />
-          </div>
-          <div class="field">
-            <label class="label" for="issue">I-describe ang issue</label>
-            <textarea id="issue" name="issue" placeholder="Hal: Na-lock ang account pagkatapos magpalit ng phone…" required></textarea>
-          </div>
-          <div class="field">
-            <label class="label" for="priority">Urgency</label>
-            <select id="priority" name="priority">
-              <option>Normal</option>
-              <option>High</option>
-              <option>Critical</option>
-            </select>
-          </div>
-          <input type="submit" class="btn" value="Send Issue" />
-          <button type="button" class="btn ghost" id="testMail">Test Mailto</button>
-          <p class="tiny" id="formStatus"></p>
-        </form>
-      </div>
-      <div class="card">
-        <h4 class="neon" style="margin:0 0 8px">Email Delivery Setup</h4>
-        <p class="tiny">May dalawang paraan para ma-receive mo ang submissions:</p>
-        <ol class="tiny">
-          <li><strong>Direct via EmailJS (recommended)</strong> — Edit mo ang mga <code>EMAILJS_*</code> keys sa ibaba. Libre ang basic tier.
-            <ul>
-              <li>Gumawa ng account sa EmailJS, create Service + Template, then ilagay ang <em>PUBLIC KEY</em>, <em>SERVICE ID</em>, at <em>TEMPLATE ID</em>.</li>
-              <li>Pag naka-setup, automatic na magse-send ng email sa iyo sa bawat submit.</li>
-            </ul>
-          </li>
-          <li><strong>Fallback Mailto</strong> — Kung walang keys, magbubukas ng email client gamit ang <code>mailto:</code> pre-filled. I-click ang “Test Mailto” para subukan.</li>
-        </ol>
-        <p class="tiny">Walang backend required; client-side lang ito. Para sa attachments, kailangan ng backend/server.</p>
-      </div>
-    </div>
-  </section>  <!-- CHATBOT -->  <section id="chat">
-    <div class="container grid grid-2">
-      <div class="card">
-        <h3 class="neon" style="margin-top:0">AI Customer Service</h3>
-        <div class="chat">
-          <div id="chatlog" class="chatlog" aria-live="polite" aria-label="Chat transcript"></div>
-          <div style="display:flex; gap:8px">
-            <input id="chatInput" placeholder="Itanong mo dito… (Hal: Paano ko irecover kung hacked?)"/>
-            <button id="sendBtn" class="btn">Send</button>
-          </div>
-          <label class="tiny" style="display:flex; align-items:center; gap:8px; margin-top:6px">
-            <input type="checkbox" id="ttsToggle"> Enable voice for bot replies
-          </label>
-        </div>
-      </div>
-      <div class="card">
-        <h4 class="neon" style="margin:0 0 8px">What this bot can do</h4>
-        <ul>
-          <li>Sasagot sa common FB recovery questions (rule-based).</li>
-          <li>Magbibigay ng step-by-step guidance.</li>
-          <li>Hindi ito official support; for advice only.</li>
-        </ul>
-        <p class="tiny">Keywords supported: <em>forgot password, no access, hacked, two-factor, code not received, locked, verify identity</em>. May general tips din.</p>
-      </div>
-    </div>
-  </section>  <!-- ABOUT -->  <section id="about">
-    <div class="container">
-      <div class="card">
-        <h3 class="neon" style="margin-top:0">About</h3>
-        <p>Ang CHDS Recovery ay independent helper lamang. Huwag magbigay ng passwords o OTP sa kahit sino. Laging i-enable ang Two-Factor Authentication (2FA) at gumamit ng strong, unique passwords.</p>
-      </div>
-    </div>
-  </section>  <footer>
-    <div class="container">© <span id="year"></span> CHDS Recovery • Neon UI by you ✨</div>
-  </footer>  <!-- Floating speech toggle (global welcome speech) --><button class="btn speech-toggle" id="welcomeBtn" title="Play welcome message">Play Welcome</button>
-
+  <!-- LOADING -->
+  <div class="overlay" id="overlay"><div><div class="spinner"></div><div class="loading-text">Loading…</div></div></div>  <!-- NAV -->  <nav><div class="container"><h2 class="neon">CHDS Recovery</h2><div class="menu"><a href="#home">Home</a><a href="#submit">Submit Issue</a><a href="#chat">AI Help</a><a href="#about">About</a></div></div></nav>  <!-- HERO -->  <section id="home" class="hero"><div class="container"><div class="card"><h2 class="neon">Facebook Recovery Assistance</h2><p>24/7 AI helper + email form + Messenger chat. Kada click may neon loading at voice greeting.</p><button class="btn" id="enterBtn">Enter</button></div></div></section>  <!-- FORM -->  <section id="submit"><div class="container"><div class="card"><h3 class="neon">Submit Your Issue</h3><form id="issueForm"><input id="name" name="name" placeholder="Pangalan" required><input id="email" name="email" type="email" placeholder="Email" required><input id="fb" name="fb" placeholder="Facebook Profile Link"><textarea id="issue" name="issue" placeholder="Describe the issue…" required></textarea><select id="priority" name="priority"><option>Normal</option><option>High</option><option>Critical</option></select><input type="submit" class="btn" value="Send Issue"><p class="tiny" id="formStatus"></p></form></div></div></section>  <!-- CHATBOT -->  <section id="chat"><div class="container"><div class="card"><h3 class="neon">AI Customer Service</h3><div class="chat"><div id="chatlog" class="chatlog"></div><div style="display:flex;gap:8px"><input id="chatInput" placeholder="Itanong mo dito…"><button id="sendBtn" class="btn">Send</button></div></div></div></div></section>  <!-- ABOUT -->  <section id="about"><div class="container"><div class="card"><h3 class="neon">About</h3><p>Independent helper only, not Meta official.</p></div></div></section>  <footer><div class="container">© <span id="year"></span> CHDS Recovery</div></footer>  <!-- FB Messenger Plugin -->  <div id="fb-root"></div>
+  <div id="fb-customer-chat" class="fb-customerchat"></div>
   <script>
-  'use strict';
-  // ====== CONFIG: Email Delivery ======
-  const EMAIL_CONFIG = {
-    EMAILJS_PUBLIC_KEY: "", // ← Paste your EmailJS PUBLIC KEY here
-    EMAILJS_SERVICE_ID: "", // ← Paste your EmailJS SERVICE ID here
-    EMAILJS_TEMPLATE_ID: "", // ← Paste your EmailJS TEMPLATE ID here
-    OWNER_EMAIL: "owner@example.com" // ← Your fallback email for mailto
-  };
+    var chatbox=document.getElementById('fb-customer-chat');
+    chatbox.setAttribute("page_id","YOUR_PAGE_ID_HERE");
+    chatbox.setAttribute("attribution","biz_inbox");
+  </script>
+  <script>
+    window.fbAsyncInit=function(){FB.init({xfbml:true,version:'v17.0'});};
+    (function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src='https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';fjs.parentNode.insertBefore(js,fjs);}(document,'script','facebook-jssdk'));
+  </script>  <script>
+    const $=s=>document.querySelector(s);
+    const speak=t=>{try{speechSynthesis.speak(new SpeechSynthesisUtterance(t))}catch(e){}};
+    const overlay=$('#overlay');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    async function showLoader(){overlay.style.display='grid';await sleep(900);overlay.style.display='none';}
 
-  // Initialize EmailJS safely if keys are present
-  (function initEmailJS(){
-    try{
-      if(window.emailjs && EMAIL_CONFIG.EMAILJS_PUBLIC_KEY){
-        window.emailjs.init({ publicKey: EMAIL_CONFIG.EMAILJS_PUBLIC_KEY });
-        console.log('EmailJS initialized');
-      }
-    }catch(e){ console.warn('EmailJS init skipped:', e); }
-  })();
+    $('#enterBtn').addEventListener('click',async()=>{await showLoader();speak('Welcome CHDS Recovery Service, please submit the issue.')});
+    $('#year').textContent=new Date().getFullYear();
 
-  // ====== UTILITIES ======
-  const $ = (sel, root=document) => root.querySelector(sel);
-  const create = (tag, cls) => { const el = document.createElement(tag); if(cls) el.className = cls; return el; };
-  const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+    // FORM: mailto fallback only
+    const form=$('#issueForm');const statusEl=$('#formStatus');
+    form.addEventListener('submit',e=>{e.preventDefault();const data=Object.fromEntries(new FormData(form).entries());const {name,email,issue}=data;if(!name||!email||!issue){statusEl.textContent='Complete required fields.';return;}window.location.href=`mailto:owner@example.com?subject=Issue from ${name}&body=${encodeURIComponent(issue)}`;});
 
-  // Smooth scroll for anchor links with loader on each click
-  document.addEventListener('click', async (e)=>{
-    const a = e.target.closest('a[href^="#"]');
-    if(!a) return;
-    const id = a.getAttribute('href');
-    const target = $(id);
-    if(!target) return;
-    e.preventDefault();
-    await showLoader();
-    target.scrollIntoView({behavior:'smooth', block:'start'});
-  });
+    // CHATBOT
+    const chatlog=$('#chatlog');const input=$('#chatInput');const sendBtn=$('#sendBtn');
+    function addBubble(t,who='bot'){const b=document.createElement('div');b.className='bubble '+who;b.textContent=t;chatlog.appendChild(b);chatlog.scrollTop=chatlog.scrollHeight;}
 
-  // Loader overlay logic
-  const overlay = $('#overlay');
-  async function showLoader(){
-    overlay.style.display = 'grid';
-    await sleep(900); // quick neon flash
-    overlay.style.display = 'none';
-  }
-
-  // Welcome speech text
-  const WELCOME_TEXT = 'Welcome CHDS Recovery Service, please submit the issue.';
-
-  // Play TTS if available
-  function speak(text){
-    try{
-      if(!('speechSynthesis' in window)) return;
-      const u = new SpeechSynthesisUtterance(text);
-      // Prefer an English voice for clarity; falls back automatically
-      const voices = speechSynthesis.getVoices();
-      const en = voices.find(v=>/en/i.test(v.lang));
-      if(en) u.voice = en;
-      u.rate = 1; u.pitch = 1; u.volume = 1;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    }catch(e){ console.warn('TTS failed', e); }
-  }
-
-  // Enter button triggers loader + speech
-  $('#enterBtn').addEventListener('click', async ()=>{
-    await showLoader();
-    speak(WELCOME_TEXT);
-  });
-  $('#welcomeBtn').addEventListener('click', ()=> speak(WELCOME_TEXT));
-
-  // Footer year
-  $('#year').textContent = new Date().getFullYear();
-
-  // ====== FORM HANDLING ======
-  const form = $('#issueForm');
-  const statusEl = $('#formStatus');
-  form.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    statusEl.textContent = '';
-
-    // Basic validation
-    const data = Object.fromEntries(new FormData(form).entries());
-    const { name, email, fb, issue, priority } = data;
-    if(!name || !email || !issue){
-      statusEl.textContent = 'Please complete the required fields.';
-      statusEl.style.color = 'var(--danger)';
-      return;
+    function botAnswer(q){q=q.toLowerCase();
+      if(q.includes('submit')) return 'Para mag submit ng issue, pumunta ka sa "Submit Issue" menu at i-fill out ang form kasama ang email, FB link, at detalye.';
+      if(q.includes('forgot')||q.includes('password')) return 'Possible issue: nakalimutan mo ang password. Gamitin ang "Forgot Password" option at sundan ang reset instructions sa email/SMS.';
+      if(q.includes('hacked')||q.includes('nahack')) return 'Possible issue: nahack ang account. Steps: (1) Reset password agad. (2) I-logout lahat ng sessions. (3) Enable 2FA. (4) Report sa Facebook Help Center kung may changes sa email/number.';
+      if(q.includes('locked')) return 'Possible issue: account locked dahil sa suspicious activity. Solution: I-follow ang on-screen verification (ID upload or code verification).';
+      if(q.includes('disabled')) return 'Possible issue: account disabled. Baka dahil sa policy violation o error. Pwede mag-appeal gamit ang form sa FB Help Center.';
+      if(q.includes('impersonation')||q.includes('fake')) return 'Possible issue: may gumagawa ng fake profile gamit details mo. Pwede i-report via FB Report tool under "Pretending to Be Someone".';
+      if(q.includes('2fa')||q.includes('two factor')) return 'Possible issue: hindi maka-login dahil sa 2FA. Siguraduhin na may access ka sa authentication method (SMS/App). Kung nawala, gamitin ang recovery codes o contact support.';
+      if(q.includes('verify')||q.includes('verification')) return 'Possible issue: kailangan ng identity verification. Ihanda ang valid ID at sundan ang steps sa FB verification page.';
+      return 'Maraming possible issues: forgot password, nahack, locked, disabled, impersonation, 2FA problem, o kailangan ng verification. Piliin ang tamang recovery option sa FB Help Center.';
     }
 
-    // Disable submit while sending
-    const submitBtn = form.querySelector('input[type="submit"]');
-    submitBtn.disabled = true; submitBtn.value = 'Sending…';
-
-    // Try EmailJS first if configured
-    let sent = false, errText = '';
-    try{
-      if(window.emailjs && EMAIL_CONFIG.EMAILJS_PUBLIC_KEY && EMAIL_CONFIG.EMAILJS_SERVICE_ID && EMAIL_CONFIG.EMAILJS_TEMPLATE_ID){
-        const payload = {
-          from_name: name,
-          reply_to: email,
-          fb_link: fb || '(none provided)',
-          message: issue,
-          priority: priority || 'Normal',
-          to_email: EMAIL_CONFIG.OWNER_EMAIL
-        };
-        await emailjs.send(EMAIL_CONFIG.EMAILJS_SERVICE_ID, EMAIL_CONFIG.EMAILJS_TEMPLATE_ID, payload);
-        sent = true;
-      }
-    }catch(err){
-      console.warn('EmailJS send failed', err);
-      errText = (err && err.text) || err?.message || String(err);
-    }
-
-    if(sent){
-      statusEl.textContent = 'Submitted! We will email you shortly.';
-      statusEl.style.color = 'var(--ok)';
-      form.reset();
-    } else {
-      // Fallback: open mailto with prefilled body
-      const subject = `CHDS Recovery Issue — ${name} (${priority||'Normal'})`;
-      const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0AFacebook: ${fb||''}%0D%0AIssue:%0D%0A${encodeURIComponent(issue)}%0D%0A`;
-      const mailto = `mailto:${encodeURIComponent(EMAIL_CONFIG.OWNER_EMAIL)}?subject=${encodeURIComponent(subject)}&body=${body}`;
-      window.location.href = mailto;
-      statusEl.textContent = 'Opening your email app (mailto fallback)…';
-      statusEl.style.color = 'var(--muted)';
-      if(errText){ statusEl.textContent += ' (EmailJS error was hidden)'; }
-    }
-
-    submitBtn.disabled = false; submitBtn.value = 'Send Issue';
-  });
-
-  // Simple button to test mailto without submitting required fields
-  $('#testMail').addEventListener('click', ()=>{
-    const mailto = `mailto:${encodeURIComponent(EMAIL_CONFIG.OWNER_EMAIL)}?subject=${encodeURIComponent('Test — CHDS Recovery')}&body=This%20is%20a%20test.`;
-    window.location.href = mailto;
-  });
-
-  // ====== CHATBOT (Rule-based helper) ======
-  const chatlog = $('#chatlog');
-  const input = $('#chatInput');
-  const sendBtn = $('#sendBtn');
-  const ttsToggle = $('#ttsToggle');
-
-  const KNOWLEDGE = [
-    { k:[/forgot\s*password|nakalimutan.*password/i], a:`Kung nakalimutan ang password: 1) I-click ang "Forgot Password" sa login. 2) Ilagay ang email/phone na naka-link. 3) Sundin ang code sa email/SMS. 4) Pagkapasok, palitan agad ang password at i-enable ang 2FA.` },
-    { k:[/no\s*access|walang\s*access|di\s*ma-access.*email|phone/i], a:`Kung wala kang access sa email/phone: i-recover muna ang email/number sa provider. Kung hindi pwede, hanapin ang opsyon na "No longer have access to these?" sa Facebook recovery at sundan ang identity verification.` },
-    { k:[/hacked|nahack|compromised/i], a:`Kung hacked: 1) Gamitin ang "Secure your account" flow ng Facebook. 2) I-check ang Active Sessions at i-log out lahat. 3) Palitan ang password. 4) I-enable 2FA (authenticator app). 5) I-review ang apps at admins ng pages.` },
-    { k:[/two[ -]?factor|2fa/i], a:`Two‑Factor Authentication (2FA): Gumamit ng authenticator app (mas secure kaysa SMS). I-save ang backup codes at huwag ibahagi kahit kanino.` },
-    { k:[/code.*not.*received|di.*nakakatanggap.*code|no.*otp/i], a:`Kung walang natatanggap na code: 1) Suriin ang signal/Spam folder. 2) Hintay ng ilang minuto at huwag paulit-ulit agad. 3) Subukan ang ibang method (email vs SMS). 4) Kung wala pa rin, gamitin ang recovery via identity verification.` },
-    { k:[/locked|na[- ]?lock|temporary.*locked/i], a:`Kung na-lock: kumpletuhin ang identity checks (profile photo, trusted device, security questions kung meron). Siguraduhing tama ang oras/petsa ng device at malinis ang browser cache.` },
-    { k:[/verify.*identity|ID|valid ID/i], a:`Identity verification tips: Gumamit ng malinaw na litrato ng valid ID, natural lighting, at tugma ang pangalan/birthday sa account. I-submit lang sa official Facebook recovery page.` },
-  ];
-
-  function addBubble(text, who='bot'){
-    const b = create('div', `bubble ${who}`);
-    b.innerHTML = text;
-    chatlog.appendChild(b);
-    chatlog.scrollTop = chatlog.scrollHeight;
-    if(who==='bot' && ttsToggle.checked) speak(b.textContent);
-  }
-
-  function botAnswer(q){
-    if(!q) return 'Paki-type ang tanong mo.';
-    for(const item of KNOWLEDGE){ if(item.k.some(rx => rx.test(q))) return item.a; }
-    return 'General tips: 1) Gumamit ng official recovery pages lang. 2) Huwag magbigay ng OTP/password. 3) I-enable 2FA. 4) Kung business page, i-check ang Admin roles at Business Manager.';
-  }
-
-  function send(){
-    const q = input.value.trim();
-    if(!q) return;
-    addBubble(q, 'user');
-    input.value = '';
-    // typing indicator
-    const typing = create('div', 'bubble bot'); typing.textContent = '…'; chatlog.appendChild(typing); chatlog.scrollTop = chatlog.scrollHeight;
-    setTimeout(()=>{
-      typing.remove();
-      addBubble(botAnswer(q), 'bot');
-    }, 450);
-  }
-
-  sendBtn.addEventListener('click', send);
-  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') send(); });
-
-  // Seed a greeting
-  addBubble('Hi! Ako ang AI Helper. Sabihin mo lang ang issue mo para matulungan kita.');
-
-  // Request notification permission (optional)
-  if('Notification' in window && Notification.permission === 'default'){
-    Notification.requestPermission().catch(()=>{});
-  }
-
+    function send(){const q=input.value.trim();if(!q)return;addBubble(q,'user');input.value='';setTimeout(()=>addBubble(botAnswer(q),'bot'),400)}
+    sendBtn.addEventListener('click',send);input.addEventListener('keydown',e=>{if(e.key==='Enter')send()});
+    addBubble('Hi! Ako ang AI Helper. Pwede ka magtanong tungkol sa issue mo sa Facebook account.');
   </script></body>
 </html>
