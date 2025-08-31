@@ -30,18 +30,24 @@
     .overlay{position:fixed;inset:0;background:#000d;display:grid;place-items:center;z-index:1000}
     .spinner{border:6px solid #333;border-top:6px solid #0ff;border-radius:50%;width:70px;height:70px;animation:spin 1s linear infinite;margin:auto}
     @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-    .loading-text{color:#0ff;margin-top:10px;font-family:'Orbitron',sans-serif;letter-spacing:2px}
+    .loading-text{color:#0ff;margin-top:10px;font-family:'Orbitron',sans-serif;letter-spacing:2px;animation:blink 1s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
   </style>
 </head>
 <body>
   <!-- LOADING -->
-  <div class="overlay" id="overlay"><div><div class="spinner"></div><div class="loading-text">Loading…</div></div></div>
+  <div class="overlay" id="overlay">
+    <div>
+      <div class="spinner"></div>
+      <div class="loading-text">Loading…</div>
+    </div>
+  </div>
 
   <!-- NAV -->
   <nav><div class="container"><h2 class="neon">CHDS Recovery</h2><div class="menu"><a href="#home">Home</a><a href="#submit">Submit Issue</a><a href="#chat">AI Help</a><a href="#about">About</a></div></div></nav>
 
   <!-- HERO -->
-  <section id="home" class="hero"><div class="container"><div class="card"><h2 class="neon">Facebook Recovery Assistance</h2><p>Kumonekta sa AI para malaman ang mga possible issues at solutions.</p><button class="btn" id="enterBtn">Enter</button></div></div></section>
+  <section id="home" class="hero"><div class="container"><div class="card"><h2 class="neon">Facebook Recovery Assistance</h2><p>Kumonekta sa AI para malaman ang mga possible issues at solutions.</p></div></div></section>
 
   <!-- FORM -->
   <section id="submit"><div class="container"><div class="card"><h3 class="neon">Submit Your Issue</h3>
@@ -72,13 +78,18 @@
   <script>
     const $=s=>document.querySelector(s);
     const speak=t=>{try{speechSynthesis.speak(new SpeechSynthesisUtterance(t))}catch(e){}};
-    const overlay=$('#overlay');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-    async function showLoader(){overlay.style.display='grid';await sleep(1500);overlay.style.display='none';}
 
-    $('#enterBtn').addEventListener('click',async()=>{await showLoader();speak('Welcome to CHDS Recovery Service, please submit your issue.')});
+    // AUTO LOADING SCREEN
+    window.addEventListener('load',()=>{
+      setTimeout(()=>{
+        $('#overlay').style.display='none';
+        speak('Welcome to CHDS Recovery Service, please submit your issue.');
+      },2000);
+    });
+
     $('#year').textContent=new Date().getFullYear();
 
-    // FORM: no email, just confirmation
+    // FORM
     const form=$('#issueForm');const statusEl=$('#formStatus');
     form.addEventListener('submit',e=>{
       e.preventDefault();
@@ -88,10 +99,9 @@
     // CHATBOT
     const chatlog=$('#chatlog');const input=$('#chatInput');const sendBtn=$('#sendBtn');
     function addBubble(t,who='bot'){const b=document.createElement('div');b.className='bubble '+who;b.textContent=t;chatlog.appendChild(b);chatlog.scrollTop=chatlog.scrollHeight;if(who==='bot')speak(t);}
-
     function botAnswer(q){q=q.toLowerCase();
       if(q.includes('submit')) return 'Para mag-submit: Pumunta sa Submit Issue tab at punan ang form. Makikita mo ang kumpirmasyon kapag naisumite na.';
-      if(q.includes('forgot')||q.includes('password')) return 'Kung nakalimutan ang password: 1) Gamitin ang Forgot Password option, 2) Pumili ng email o phone para makatanggap ng reset link, 3) Palitan agad ng strong password.';
+      if(q.includes('forgot')||q.includes('password')) return 'Kung nakalimutan ang password: 1) Gamitin ang Forgot Password option, 2) Piliin ang email o phone para makatanggap ng reset link, 3) Palitan agad ng strong password.';
       if(q.includes('hacked')||q.includes('nahack')) return 'Kung nahack: 1) I-reset agad ang password, 2) Mag-log out sa lahat ng devices, 3) Enable 2FA, 4) Report ang hack sa Facebook Help Center.';
       if(q.includes('locked')) return 'Kung locked: Dahil sa suspicious activity. Sundin ang on-screen instructions para sa identity verification (upload ng ID o code).';
       if(q.includes('disabled')) return 'Kung disabled: Maaaring violation o error. Pumunta sa Facebook Help Center at mag-submit ng appeal gamit ang ID at detalye.';
@@ -102,7 +112,6 @@
       if(q.includes('recover')||q.includes('recovery')) return 'Recovery steps: 1) Subukan ang email/phone na naka-link, 2) Gumamit ng trusted contacts kung available, 3) Sundin ang official recovery form ng Facebook.';
       return 'Pwede mong itanong tungkol sa: forgot password, hacked, locked, disabled, impersonation, 2FA, verification, phishing, o recovery. Sabihin mo lang ang sitwasyon at may gabay ako.';
     }
-
     function send(){const q=input.value.trim();if(!q)return;addBubble(q,'user');input.value='';setTimeout(()=>addBubble(botAnswer(q),'bot'),500)}
     sendBtn.addEventListener('click',send);input.addEventListener('keydown',e=>{if(e.key==='Enter')send()});
     addBubble('Hi! Ako ang AI Helper. Sabihin mo kung anong problema sa Facebook account mo para makapagbigay ako ng posibleng solusyon.');
